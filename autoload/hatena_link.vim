@@ -2,19 +2,20 @@
 " Filename: autoload/hatena_link.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2015/09/06 18:52:13.
+" Last Change: 2015/10/22 08:55:57.
 " =============================================================================
 
 let s:save_cpo = &cpo
 set cpo&vim
 
 function! hatena_link#paste(link) abort
-  let link = get(a:link, 0, @+)
+  let link = substitute(get(a:link, 0, @+), '\v#[^/#]+$', '', '')
   if link =~# '\v^https?://'
-    if link =~# '\v^https?://.*(issues|pull)/\d+$'
-      let title =  '#' . matchstr(link, '\v(issues|pull)/\zs\d+$')
+    if link =~# '\v^https?://.*(issues|pull)/\d+(#[a-z]+-[0-9]+)?$'
+      let title =  matchstr(link, '\v^https?://[^/]*/\zs.*\ze/(issues|pull)')
+            \ . ' #' . matchstr(link, '\v(issues|pull)/\zs\d+$')
     else
-      let title = system('curl -sL ' . link . ' | perl -l -0777 -ne ''print $1 if /<title.*?>\s*(.*?)\s*<\/title/si'' | tr -d ''\n''')
+      let title = system('curl -sL ' . link . ' | perl -l -0777 -ne ''print $1 if /<title.*?>\s*(.*?)\s*<\/title/si'' | tr -d ''\n'' | tr ''·'' ''-''')
     endif
     let text = '[' . link . ':title=' . title . ']'
     if getline('.') =~# '[^ ]$' && getline('.')[col('.'):] ==# ''
