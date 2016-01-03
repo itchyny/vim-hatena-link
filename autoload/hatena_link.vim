@@ -2,14 +2,14 @@
 " Filename: autoload/hatena_link.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2016/01/04 00:36:38.
+" Last Change: 2016/01/04 00:41:15.
 " =============================================================================
 
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! hatena_link#paste(link) abort
-  let link = get(a:link, 0, @+)
+function! hatena_link#paste(text) abort
+  let link = a:text ==# '' ? @+ : a:text
   if link =~# '\v^https?://'
     let link = substitute(link, '\v#[^/#]+$', '', '')
     if link =~# '\v^https?://.*(issues|pull)/\d+$'
