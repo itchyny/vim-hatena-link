@@ -2,7 +2,7 @@
 " Filename: autoload/hatena_link.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2015/10/22 08:55:57.
+" Last Change: 2016/01/03 21:07:18.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -25,7 +25,15 @@ function! hatena_link#paste(link) abort
     let text = link
   endif
   let pos = getcurpos()
-  call setline(line('.'), getline('.')[:col('.') - 1] . text . getline('.')[col('.'):])
+  let col = 0
+  for c in split(getline('.'), '\zs')
+    let col += len(c)
+    if col('.') <= col
+      let pos[2] += len(c) - 1
+      break
+    endif
+  endfor
+  call setline(line('.'), getline('.')[:col - 1] . text . getline('.')[col :])
   let pos[2] += len(text)
   call setpos('.', pos)
 endfunction
