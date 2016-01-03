@@ -1,8 +1,8 @@
-" " =============================================================================
+" =============================================================================
 " Filename: autoload/hatena_link.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2016/01/03 21:07:18.
+" Last Change: 2016/01/04 00:26:10.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -18,9 +18,6 @@ function! hatena_link#paste(link) abort
       let title = system('curl -sL ' . link . ' | perl -l -0777 -ne ''print $1 if /<title.*?>\s*(.*?)\s*<\/title/si'' | tr -d ''\n'' | tr ''·'' ''-''')
     endif
     let text = '[' . link . ':title=' . title . ']'
-    if getline('.') =~# '[^ ]$' && getline('.')[col('.'):] ==# ''
-      let text = ' ' . text
-    endif
   else
     let text = link
   endif
@@ -33,6 +30,9 @@ function! hatena_link#paste(link) abort
       break
     endif
   endfor
+  if text !=# link && getline('.')[:col - 1] =~# '\S$' && getline('.')[col :] ==# ''
+    let text = ' ' . text
+  endif
   call setline(line('.'), getline('.')[:col - 1] . text . getline('.')[col :])
   let pos[2] += len(text)
   call setpos('.', pos)
