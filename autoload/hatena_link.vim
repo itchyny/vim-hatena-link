@@ -2,7 +2,7 @@
 " Filename: autoload/hatena_link.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2016/01/04 00:41:15.
+" Last Change: 2019/01/15 20:16:00.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -16,7 +16,14 @@ function! hatena_link#paste(text) abort
       let title =  matchstr(link, '\v^https?://[^/]+/\zs.*\ze/(issues|pull)')
             \ . ' #' . matchstr(link, '\v(issues|pull)/\zs\d+')
     else
-      let title = system('curl -sL ' . link . ' | perl -l -0777 -ne ''print $1 if /<title.*?>\s*(.*?)\s*<\/title/si'' | tr -d ''\n'' | tr ''·'' ''-''')
+      let lines = split(system('curl -sL "' . link . '"'), '\n')
+      let title = ''
+      for line in lines
+        if line =~# '\c<title.*>.*</title'
+          let title = matchstr(line, '<title.*>\zs.*\ze</title')
+          break
+        endif
+      endfor
     endif
     let text = '[' . link . ':title=' . title . ']'
   else
